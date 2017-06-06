@@ -43,10 +43,8 @@ public class PhoneActor extends Actor {
         flipped = !flipped;
         if (flipped) {
             setBounds(getX(),getY(), 60, 80);
-            //setBounds(0,0, 60, 80);
         } else {
             setBounds(getX(),getY(), 80, 60);
-            //setBounds(0,0, 80, 60);
         }
     }
 }

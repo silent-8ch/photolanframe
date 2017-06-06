@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.IntFloatMap;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import org.json.JSONArray;
@@ -22,12 +21,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.KeyStroke;
-
 import p4u1.dd.phone_lan_frame.PhoneLanFrameGame;
 import p4u1.dd.phone_lan_frame.network.MessageAdapter;
 import p4u1.dd.phone_lan_frame.utils.PaulGraphics;
-import p4u1.dd.phone_lan_frame.utils.URLSprite;
 
 import static com.badlogic.gdx.Gdx.*;
 
@@ -44,13 +40,15 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
     OrthographicCamera camera;
     boolean pinching = false;
     float pinch_ratio;
-
     float scale = 100;
     float temp_float = -1;
     ArrayList<PhoneIcon> phones = new ArrayList<PhoneIcon>();
     Vector2 firstTouch;
     PhotoLanScreen previous;
-
+    float left, right, top, bottom;
+    boolean noBounds = true;
+    Vector2 worldCorner = new Vector2();
+    Vector2 oldCorner;
 
     public OrientationScreen(PhoneLanFrameGame arg0, PhotoLanScreen arg1) {
         previous = arg1;
@@ -67,24 +65,19 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
         multiplex.addProcessor(this);
         multiplex.addProcessor(gd);
         Gdx.input.setInputProcessor(multiplex);
-
     }
-
-
 
     @Override
     public void show() {
-
     }
-
     @Override
     public void render(float delta) {
         logic();
-        //Gdx.app.log("phlusko", "actor loc: " + stage.getActors().get(0).getX() + "," + stage.getActors().get(0).getY());
         shape.setProjectionMatrix(camera.combined);
         batch.setProjectionMatrix(camera.combined);
 
         PhoneActor.setShape(shape);
+
         gl.glClearColor(0, 0, 255, 255);
         gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -101,6 +94,7 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
         shape.rect(0, 300 - half_scale, 50, scale);
         shape.rect(750, 300 - half_scale, 50, scale);
         shape.end();
+
         if (!noBounds) {
             shape.begin(ShapeRenderer.ShapeType.Line);
             shape.setColor(Color.GREEN);
@@ -108,12 +102,10 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
             shape.end();
         }
         drawPhones();
-
     }
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     public void drawPhones() {
@@ -126,13 +118,8 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
     public void logic() {
         setBounds();
         processMessages();
-
-
     }
-    float left, right, top, bottom;
-    boolean noBounds = true;
-    Vector2 worldCorner = new Vector2();
-    Vector2 oldCorner;
+
     public void setBounds() {
         noBounds = true;
         for(Iterator<PhoneIcon> i = phones.iterator(); i.hasNext();) {
@@ -154,6 +141,7 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
         worldCorner.x = left;
         worldCorner.y = bottom;
     }
+
     public void requestPartyInfo() {
         try {
             JSONObject data = null;
@@ -161,7 +149,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
             data.put("type", "partyInfoRequest");
             messageAdapter.sendMessage(data.toString());
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
     }
 
@@ -170,12 +157,10 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
             if (messageAdapter.getMessageHolder().getListSize() > 0) {
                 String message = messageAdapter.getMessageHolder().popMessage();
                 app.log("phlusko", "OrientationScreen got message: " + message);
-
                 JSONObject data = new JSONObject(message);
                 String type = data.getString("type");
                 if (type.contentEquals("partyInfo")){
                     partySize = data.getInt("party_size");
-                    //updateParty();
                     updateParty(data);
                 }
                 if (type.contentEquals("gotoPhoto")){
@@ -183,7 +168,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
                 }
             }
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
     }
 
@@ -210,7 +194,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
                 phones.add(temp);
             }
         } catch (JSONException e) {
-//            e.printStackTrace();
         }
     }
 
@@ -232,27 +215,22 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
     public void dispose() {
-
     }
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
-
         return false;
     }
 
@@ -292,8 +270,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
         return false;
     }
 
-
-
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
         pinching = true;
@@ -303,7 +279,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
         }
         scale = temp_float * pinch_ratio;
         Gdx.app.log("phlusko", "scale: " + scale);
-
         return false;
     }
 
@@ -315,7 +290,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
             data.put("scale", scale);
             messageAdapter.sendMessage(data.toString());
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
     }
 
@@ -340,7 +314,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
             game.setScreen(previous);
         }
         if (keycode == Input.Keys.UP) {
@@ -371,10 +344,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         for (Iterator<PhoneIcon> i = phones.iterator(); i.hasNext();) {
             PhoneIcon curr = i.next();
-            if (curr.touched && TimeUtils.millis() - curr.startTouch < 300) {
-//                curr.flip();
-                Gdx.app.log("phlusko", "yo");
-            }
 
             if (curr.touched) {
                 sendPhoneMoved(curr.order);
@@ -395,7 +364,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
             response.put("y", phones.get(arg0).loc.y - oldCorner.y);
             messageAdapter.sendMessage(response.toString());
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
 
     }
@@ -403,7 +371,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        //Gdx.app.log("phlusko", "dragged : " + screenX+ "," + screenY);
         Vector2 spot = PaulGraphics.pixelToCoord(screenX, screenY);
         for (Iterator<PhoneIcon> i = phones.iterator(); i.hasNext();) {
             PhoneIcon curr = i.next();
@@ -471,7 +438,6 @@ public class OrientationScreen implements Screen, GestureDetector.GestureListene
             if (hit.x < right && hit.x > left && hit.y < top && hit.y > bottom) {
                 this.touched = true;
                 this.startTouch = TimeUtils.millis();
-                Gdx.app.log("phlusko", "im touched");
                 firstLoc = loc.cpy();
                 firstTouch = PaulGraphics.pixelToCoord(new Vector2(arg0, arg1)).sub(loc);
             }

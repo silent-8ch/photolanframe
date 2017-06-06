@@ -21,7 +21,6 @@ public class PhonePositions {
     volatile ArrayList<Phone> phones = new ArrayList<Phone>();
 
     public PhonePositions() {
-
     }
 
     public JSONObject getWorldJSON() {
@@ -44,7 +43,6 @@ public class PhonePositions {
             }
             response.put("phones", phone_datas);
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
         return response;
     }
@@ -57,7 +55,6 @@ public class PhonePositions {
             temp.setScale(scale);
             boundWorld();
         } catch (JSONException e) {
-//            e.printStackTrace();
         }
     }
 
@@ -69,7 +66,6 @@ public class PhonePositions {
             temp.loc = newLoc;
             boundWorld();
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
 
     }
@@ -88,6 +84,7 @@ public class PhonePositions {
     public void addPhone(Phone arg0) {
         addPhone(arg0.loc, arg0.dimensions, arg0.order);
     }
+
     public void addPhone(Vector2 arg0, Vector2 arg1, int arg2) {
         Phone newPhone = new Phone(arg0, arg1, arg2);
         phones.add(newPhone);
@@ -124,7 +121,6 @@ public class PhonePositions {
             boundWorld();
         } else {
             bigDimensions = new Vector2(right - left, top - bottom);
-            Gdx.app.log("phlusko", ""+bigDimensions.toString() + " " + right + " " + left + " " + top + " " + bottom);
         }
     }
 

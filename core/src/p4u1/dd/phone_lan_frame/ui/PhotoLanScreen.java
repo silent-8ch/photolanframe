@@ -17,34 +17,29 @@ import org.json.JSONObject;
 
 import p4u1.dd.phone_lan_frame.PhoneLanFrameGame;
 import p4u1.dd.phone_lan_frame.network.MessageAdapter;
-import p4u1.dd.phone_lan_frame.utils.URLSprite;
 
 /**
  * Created by Paul on 1/10/2017.
  */
 
 public class PhotoLanScreen implements Screen {
-
     int position = -1;
-    int total;
+    int lineHeight = -1;
+    int maxHeight;
+    int offset = 0;
+    float lineStart;
+    boolean updated = false;
+    Vector2 worldoffset;
     MessageAdapter message_adapter;
     PhoneLanFrameGame game;
     SpriteBatch batch;
     OrthographicCamera camera;
-    int lineHeight = -1;
     ShapeRenderer shape;
-    int maxHeight;
-
-    float lineStart;
-    int offset = 0;
     Texture photoTexture;
     Sprite photoSprite;
-    volatile URLSprite urlSprite;
 
     public PhotoLanScreen(PhoneLanFrameGame arg1, MessageAdapter arg0) {
-
         this.message_adapter = arg0;
-
         shape = new ShapeRenderer();
         game = arg1;
         batch = new SpriteBatch();
@@ -52,7 +47,6 @@ public class PhotoLanScreen implements Screen {
         camera.setToOrtho(false, 800, 600);
         photoTexture = new Texture(Gdx.files.internal("img/photo.png"));
         photoSprite = new Sprite(photoTexture);
-        urlSprite = new URLSprite("http://p4u1.com/photoapi/anni5_a%20(Medium).jpg");
     }
     @Override
     public void show() {
@@ -62,7 +56,6 @@ public class PhotoLanScreen implements Screen {
             data.put("order", position);
             message_adapter.sendMessage(data.toString());
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
     }
 
@@ -89,27 +82,20 @@ public class PhotoLanScreen implements Screen {
         }
         batch.begin();
         if (updated) {
-            if (!urlSprite.imageReady) {
                 photoSprite.setPosition(0 - worldoffset.x, 0 - worldoffset.y);
                 photoSprite.draw(batch);
-            } else {
-                urlSprite.sprite.setPosition(0 - worldoffset.x, 0 - worldoffset.y);
-                urlSprite.sprite.draw(batch);
-            }
         }
-
         batch.end();
     }
 
     public void logic() {
         if (message_adapter.getMessageHolder().getListSize() > 0) {
-            //Gdx.app.log("phlusko", "getting info back:" + message_adapter.getMessageHolder().popMessage());
             processMessage(message_adapter.getMessageHolder().popMessage());
         }
         if (lineHeight > -1) {
             lineHeight = (((int) System.currentTimeMillis() - (int) lineStart) + offset) % maxHeight;
         }
-        if (Gdx.input.justTouched()) {// && message_adapter.type == MessageAdapter.SERVER_MESSAGES) {
+        if (Gdx.input.justTouched()) {
             JSONObject response = new JSONObject();
             try {
                 response.put("type", "gotoOrientation");
@@ -119,7 +105,6 @@ public class PhotoLanScreen implements Screen {
             }
             game.setScreen(new OrientationScreen(game, this));
         }
-        //Gdx.app.log("phlusko", "" + urlSprite.imageReady);
     }
 
     public void processMessage(String arg0) {
@@ -156,12 +141,10 @@ public class PhotoLanScreen implements Screen {
                 game.setScreen(new OrientationScreen(game, this));
             }
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
     }
 
-    Vector2 worldoffset;
-    boolean updated = false;
+
 
     public void updateWindow(JSONObject arg0) {
         try {
@@ -169,9 +152,6 @@ public class PhotoLanScreen implements Screen {
             float worldWidth = arg0.getLong("world_width") * 10;
             float worldHeight = arg0.getLong("world_height") * 10;
             photoSprite.setSize(worldWidth, worldHeight);
-            if (urlSprite.imageReady) {
-                urlSprite.sprite.setSize(worldWidth, worldHeight);
-            }
 
             for (int i = 0; i < phone_datas.length(); i++) {
                 JSONObject currPhone = phone_datas.getJSONObject(i);
@@ -188,34 +168,26 @@ public class PhotoLanScreen implements Screen {
                 }
             }
         } catch (JSONException e) {
-            //e.printStackTrace();
         }
-
-
     }
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
     public void dispose() {
-
     }
 }
