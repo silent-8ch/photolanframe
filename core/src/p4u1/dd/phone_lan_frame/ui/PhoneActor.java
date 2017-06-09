@@ -36,8 +36,7 @@ public class PhoneActor extends Actor {
     }
 
     public static void setShape(ShapeRenderer shape) {
-        PhoneActor temp = new PhoneActor();
-        temp.shape = shape;
+        PhoneActor.shape = shape;
     }
     public void flip() {
         flipped = !flipped;
