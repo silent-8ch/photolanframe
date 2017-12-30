@@ -17,8 +17,11 @@ public class PaulGraphics {
     static public Vector2 pixelToCoord(Vector2 arg0) {
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
+        //Gdx.app.log("phlusko", "touch : " + width+ "," + height);
+        //Gdx.app.log("phlusko", "touch : " + GAME_WIDTH+ "," + GAME_HEIGHT);
         float x = (arg0.x * GAME_WIDTH) / width;
         float y = GAME_HEIGHT - (((arg0.y) * GAME_HEIGHT) / height);
+
         return new Vector2(x, y);
     }
     static public Vector2 pixelToCoord(float arg0, float arg1) {

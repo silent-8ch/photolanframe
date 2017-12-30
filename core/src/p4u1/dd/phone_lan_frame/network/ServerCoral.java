@@ -17,7 +17,6 @@ public class ServerCoral implements Runnable {
     public ServerCoral (PhotoLanServer arg0) {
         photoLanServer = arg0;
     }
-
     @Override
     public void run() {
         while (true) try {
@@ -28,19 +27,21 @@ public class ServerCoral implements Runnable {
             photoLanServer.world.addPhone(photoLanServer.workhorses.size());
 
             Gdx.app.log("phlusko", "Client Connected from: " + horse.socket.getInetAddress().getHostName());
-
             photoLanServer.ready = true;
             JSONObject data;
             data = new JSONObject();
             try {
                 data.put("type", "ready");
+                //photoLanServer.demo1.startLines();
                 photoLanServer.messageHolder.addMessage(data.toString());
                 data.put("type", "ping");
                 data.put("timestamp", System.currentTimeMillis());
                 horse.out.println(data.toString());
             } catch (JSONException e) {
+                //e.printStackTrace();
             }
         } catch (IOException e) {
+            //
         }
     }
 }

@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import p4u1.dd.phone_lan_frame.demos.LineDemo;
 import p4u1.dd.phone_lan_frame.ui.ConnectionScreen;
 import p4u1.dd.phone_lan_frame.utils.PhonePositions;
 
@@ -26,8 +27,10 @@ public class PhotoLanServer implements Runnable{
     public volatile MessageHolder messageHolder = new MessageHolder();
     public volatile MessageHolder leaderMessages = new MessageHolder();
     public volatile boolean ready = false;
-    PrintWriter out;
+    PrintWriter out;// = new PrintWriter(players[1].horse.socket.getOutputStream(), true);
     boolean running = true;
+    //public LineDemo demo1;
+    int ping;
     public volatile PhonePositions world;
 
     public PhotoLanServer() {
@@ -37,12 +40,16 @@ public class PhotoLanServer implements Runnable{
             new Thread(new ServerCoral(this)).start();
             new Thread(this).start();
         } catch (IOException e) {
+            //e.printStackTrace();
             Gdx.app.log("phlusko", "cant make server");
+            //Gdx.app.exit();
         }
         world = new PhonePositions();
         world.addPhone();
         updateLanPositions();
+        //demo1 = new LineDemo(this);
     }
+
 
     @Override
     public void run() {
@@ -51,9 +58,14 @@ public class PhotoLanServer implements Runnable{
         }
     }
 
+
+
     public void logic() {
         while (messageHolder.getListSize() > 0) {
             processMessage(messageHolder.popMessage());
+        }
+        if (workhorses.size() > 0) {
+            //demo1.update();
         }
     }
 
@@ -94,6 +106,7 @@ public class PhotoLanServer implements Runnable{
             }
             Gdx.app.log("phlusko", "server received: " + data.toString());
         } catch (JSONException e) {
+            //e.printStackTrace();
         }
     }
 
@@ -104,6 +117,7 @@ public class PhotoLanServer implements Runnable{
             response.put("party_size", workhorses.size() + 1);
             broadcast(response.toString());
         } catch (JSONException e) {
+            //e.printStackTrace();
         }
 
 
@@ -113,6 +127,7 @@ public class PhotoLanServer implements Runnable{
         try {
             JSONObject data = new JSONObject();
             data.put("type", "getPosition");
+
             data.put("position", 0);
             leaderMessages.addMessage(data.toString());
             int position_count = 1;
@@ -143,6 +158,7 @@ public class PhotoLanServer implements Runnable{
             ServerWorkhorse item = i.next();
             item.out.println(arg0);
         }
+        //sendMessage(arg0);
     }
 
     public void sendMessage(String arg0){
@@ -157,9 +173,12 @@ public class PhotoLanServer implements Runnable{
             for(Iterator<ServerWorkhorse> i = workhorses.iterator(); i.hasNext(); ) {
                 ServerWorkhorse item = i.next();
                 item.out.println(data.toString());
+                //System.out.println(item);
             }
             leaderMessages.addMessage(data.toString());
         } catch (JSONException e) {
+            //e.printStackTrace();
         }
     }
+
 }

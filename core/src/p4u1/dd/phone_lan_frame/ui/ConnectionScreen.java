@@ -23,17 +23,19 @@ import p4u1.dd.phone_lan_frame.network.ServerMessages;
  */
 
 public class ConnectionScreen implements Screen{
-    public static int port = 6969;
 
+    public static int port = 6969;
     OrthographicCamera camera;
     PhoneLanFrameGame game;
     SpriteBatch batch;
     Texture clock;
+
     boolean is_waiting = true;
     boolean searching = false;
     boolean amServer;
     BroadcastClient broadcastClient;
     long searchStart;
+    int lineHeight;
 
     public ConnectionScreen (PhoneLanFrameGame arg0) {
         this.game = arg0;
@@ -96,6 +98,7 @@ public class ConnectionScreen implements Screen{
     public void logic () {
         if (searching) {
             long currentTime = System.currentTimeMillis();
+            //Gdx.app.log("phlusko", "No Servers Found . " + (currentTime - searchStart));
             if (currentTime - searchStart > 5000) {
                 broadcastClient.stopSearch();
                 Gdx.app.log("phlusko", "No Servers Found");
@@ -108,6 +111,7 @@ public class ConnectionScreen implements Screen{
                     amServer = true;
                     Gdx.app.log("phlusko", "Start Server");
                     game.setScreen(new PhotoLanScreen(game, new ServerMessages(game.server)));
+                    //game.setScreen(new p4u1.dd.phone_lan_frame.demos.Blah());
                     searching = false;
                     amServer = true;
                     is_waiting = true;
@@ -118,7 +122,7 @@ public class ConnectionScreen implements Screen{
             } else {
                 String serverIP = broadcastClient.getServerIP();
                 if (serverIP != null) {
-                    Gdx.app.log("phlusko", "Found Server at: " + serverIP);
+                    //Gdx.app.log("phlusko", "Found Server at: " + serverIP);
                     searchStart = 0;
                     try {
                         game.client = new ClientWorkhorse(new Socket(serverIP, port));
@@ -127,7 +131,8 @@ public class ConnectionScreen implements Screen{
                         searching = false;
                         amServer = false;
                     } catch (IOException e) {
-                        Gdx.app.log("phlusko", "Bad ju ju: sever connection error.");
+                        //e.printStackTrace();
+                        Gdx.app.log("phlusko", "Bad ju ju");
                     }
                 }
             }
